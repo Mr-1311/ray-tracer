@@ -1,3 +1,3 @@
 fn main() {
-    ray_tracer::generate_img();
+    ray_tracer::ray_tracer();
 }
