@@ -34,4 +34,14 @@ mod test {
 
         assert_eq!(r1, r2);
     }
+
+    #[test]
+    fn point_at_parameter() {
+        let origin = Vec3::new(0.0, 0.0, 0.0);
+        let direction = Vec3::new(5.0, 10.0, 15.0);
+
+        let ray = Ray::new(origin, direction);
+
+        assert_eq!(ray.point_at_parameter(2.0), Vec3::new(10.0, 20.0, 30.0));
+    }
 }
