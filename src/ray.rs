@@ -8,14 +8,13 @@ pub struct Ray {
 
 impl Ray {
     pub fn new(origin: Vec3, direction: Vec3) -> Ray {
-        Ray {origin, direction}
+        Ray { origin, direction }
     }
 
-    pub fn point_at_parameter(&self, t: f64 ) -> Vec3 {
+    pub fn point_at_parameter(&self, t: f64) -> Vec3 {
         self.origin + t * self.direction
     }
 }
-
 
 #[cfg(test)]
 mod test {
@@ -24,13 +23,10 @@ mod test {
     #[test]
     fn new() {
         let r1 = Ray {
-            origin: Vec3::new(1.0, 1.0, 1.0,),
-            direction: Vec3::new(1.0, 1.0, 1.0,),
+            origin: Vec3::new(1.0, 1.0, 1.0),
+            direction: Vec3::new(1.0, 1.0, 1.0),
         };
-        let r2 = Ray::new (
-            Vec3::new(1.0, 1.0, 1.0,),
-            Vec3::new(1.0, 1.0, 1.0,),
-        );
+        let r2 = Ray::new(Vec3::new(1.0, 1.0, 1.0), Vec3::new(1.0, 1.0, 1.0));
 
         assert_eq!(r1, r2);
     }

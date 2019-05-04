@@ -1,15 +1,15 @@
-use std::ops::{Add, Mul, Neg, Sub, Div};
+use std::ops::{Add, Div, Mul, Neg, Sub};
 
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub struct Vec3 {
     pub x: f64,
     pub y: f64,
-    pub z: f64,    
+    pub z: f64,
 }
 
 impl Vec3 {
     pub fn new(x: f64, y: f64, z: f64) -> Vec3 {
-        Vec3{x, y, z}
+        Vec3 { x, y, z }
     }
 
     pub fn r(&self) -> f64 {
@@ -21,7 +21,7 @@ impl Vec3 {
     pub fn b(&self) -> f64 {
         self.z
     }
-  
+
     pub fn length(&self) -> f64 {
         f64::sqrt(self.x * self.x + self.y * self.y + self.z * self.z)
     }
@@ -45,7 +45,6 @@ impl Vec3 {
             z: v1.x * v2.y - v1.y * v2.x,
         }
     }
-
 }
 
 impl Add for Vec3 {
@@ -156,7 +155,6 @@ impl Neg for Vec3 {
     }
 }
 
-
 #[cfg(test)]
 mod test {
     use super::*;
@@ -165,7 +163,14 @@ mod test {
     fn new() {
         let vec = Vec3::new(1.0, 1.0, 1.0);
 
-        assert_eq!(vec, Vec3{x: 1.0, y: 1.0, z: 1.0});
+        assert_eq!(
+            vec,
+            Vec3 {
+                x: 1.0,
+                y: 1.0,
+                z: 1.0
+            }
+        );
     }
 
     #[test]
@@ -178,30 +183,27 @@ mod test {
 
     #[test]
     fn vector_add() {
-
         let vec1 = Vec3::new(0.0, 1.0, 2.0);
         let vec2 = Vec3::new(2.0, 1.0, 0.0);
-        
+
         let add = vec1 + vec2;
         assert_eq!(add, Vec3::new(2.0, 2.0, 2.0));
     }
 
     #[test]
     fn vector_sub() {
-
         let vec1 = Vec3::new(0.0, 1.0, 2.0);
         let vec2 = Vec3::new(2.0, 1.0, 0.0);
-        
+
         let sub = vec1 - vec2;
         assert_eq!(sub, Vec3::new(-2.0, 0.0, 2.0));
     }
-    
+
     #[test]
     fn vector_mul() {
-
         let vec1 = Vec3::new(0.0, 1.0, 2.0);
         let vec2 = Vec3::new(2.0, 1.0, 3.0);
-        
+
         let mul = vec1 * vec2;
         assert_eq!(mul, Vec3::new(0.0, 1.0, 6.0));
 
@@ -210,15 +212,13 @@ mod test {
 
         let mul = 2.0 * vec1;
         assert_eq!(mul, Vec3::new(0.0, 2.0, 4.0));
-    
     }
 
     #[test]
     fn vector_div() {
-
         let vec1 = Vec3::new(0.0, 2.0, 4.0);
         let vec2 = Vec3::new(2.0, 1.0, 8.0);
-        
+
         let div = vec1 / vec2;
         assert_eq!(div, Vec3::new(0.0, 2.0, 0.5));
 
@@ -232,9 +232,8 @@ mod test {
 
     #[test]
     fn vector_neg() {
-
         let vec1 = Vec3::new(0.0, 2.0, 4.0);
-        
+
         let neg = -vec1;
         assert_eq!(neg, Vec3::new(0.0, -2.0, -4.0));
     }
