@@ -39,13 +39,13 @@ pub fn ray_tracer() {
                 let u: f64 = (i as f64 + ur) / nx as f64;
                 let v: f64 = (j as f64 + vr) / ny as f64;
 
-                //cam = Camera::default();
                 let r = cam.get_ray(u, v);
-                let p = r.point_at_parameter(2.0);
+                //let p = r.point_at_parameter(2.0);
                 col = col + color(&r, &world);
             }
 
             col = col / (ns as f64);
+            col = Vec3::new(f64::sqrt(col.x), f64::sqrt(col.y), f64::sqrt(col.z));
             let ir = (255.99 * col.r()) as i64;
             let ig = (255.99 * col.g()) as i64;
             let ib = (255.99 * col.b()) as i64;
