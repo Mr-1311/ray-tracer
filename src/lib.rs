@@ -1,10 +1,13 @@
+mod camera;
 mod ray;
 mod reflexible;
 mod sphere;
 mod vec3;
 
+use rand::Rng;
+
+use camera::Camera;
 use ray::Ray;
-use reflexible::HitRecord;
 use reflexible::Reflexible;
 use reflexible::ReflexibleList;
 use sphere::Sphere;
@@ -13,11 +16,7 @@ use vec3::Vec3;
 pub fn ray_tracer() {
     let nx = 400;
     let ny = 200;
-
-    let lover_left_corner = Vec3::new(-2.0, -1.0, -1.0);
-    let horizontal = Vec3::new(4.0, 0.0, 0.0);
-    let vertical = Vec3::new(0.0, 2.0, 0.0);
-    let origin = Vec3::new(0.0, 0.0, 0.0);
+    let ns = 100;
 
     let sphere_1 = Sphere::new(Vec3::new(0.0, 0.0, -1.0), 0.5);
     let sphere_2 = Sphere::new(Vec3::new(0.0, -100.5, -1.0), 100.0);
@@ -25,18 +24,28 @@ pub fn ray_tracer() {
     let list: Vec<Box<dyn Reflexible>> = vec![Box::new(sphere_1), Box::new(sphere_2)];
     let world = ReflexibleList::new(list);
 
+    //let mut cam = Camera::default();
+
+    let mut rng = rand::thread_rng();
+
     println!("P3\n{} {}\n255", nx, ny);
 
     for j in (0..ny).rev() {
         for i in 0..nx {
-            let u: f64 = i as f64 / nx as f64;
-            let v: f64 = j as f64 / ny as f64;
+            let mut col = Vec3::new(0.0, 0.0, 0.0);
+            for _ in 0..ns {
+                let ur: f64 = rng.gen();
+                let vr: f64 = rng.gen();
+                let u: f64 = (i as f64 + ur) / nx as f64;
+                let v: f64 = (j as f64 + vr) / ny as f64;
 
-            let r = Ray::new(origin, lover_left_corner + u * horizontal + v * vertical);
+                let cam = Camera::default();
+                let r = cam.get_ray(u, v);
+                let p = r.point_at_parameter(2.0);
+                col = col + color(&r, &world);
+            }
 
-            let p = r.point_at_parameter(2.0);
-            let col = color(&r, &world);
-
+            col = col / (ns as f64);
             let ir = (255.99 * col.r()) as i64;
             let ig = (255.99 * col.g()) as i64;
             let ib = (255.99 * col.b()) as i64;
