@@ -24,7 +24,7 @@ pub fn ray_tracer() {
     let list: Vec<Box<dyn Reflexible>> = vec![Box::new(sphere_1), Box::new(sphere_2)];
     let world = ReflexibleList::new(list);
 
-    //let mut cam = Camera::default();
+    let cam = Camera::default();
 
     let mut rng = rand::thread_rng();
 
@@ -39,7 +39,7 @@ pub fn ray_tracer() {
                 let u: f64 = (i as f64 + ur) / nx as f64;
                 let v: f64 = (j as f64 + vr) / ny as f64;
 
-                let cam = Camera::default();
+                //cam = Camera::default();
                 let r = cam.get_ray(u, v);
                 let p = r.point_at_parameter(2.0);
                 col = col + color(&r, &world);
@@ -57,13 +57,31 @@ pub fn ray_tracer() {
 
 fn color(r: &Ray, world: &Reflexible) -> Vec3 {
     if let Some(rec) = world.hit(r, 0.0, std::f64::MAX) {
-        return 0.5 * Vec3::new(rec.normal.x + 1.0, rec.normal.y + 1.0, rec.normal.z + 1.0);
+        let target = rec.p + rec.normal + random_in_unit_sphere();
+        return 0.5 * color(&Ray::new(rec.p, target - rec.p), world);
     } else {
         let unit_direction = Vec3::unit_vector(r.direction);
         let t: f64 = 0.5 * (unit_direction.y + 1.0);
 
         (1.0 - t) * Vec3::new(1.0, 1.0, 1.0) + t * Vec3::new(0.5, 0.7, 1.0)
     }
+}
+
+fn random_in_unit_sphere() -> Vec3 {
+    let mut p: Vec3;
+    let mut rng = rand::thread_rng();
+
+    loop {
+        let x: f64 = rng.gen();
+        let y: f64 = rng.gen();
+        let z: f64 = rng.gen();
+        p = 2.0 * Vec3::new(x, y, z) - Vec3::new(0.0, 0.0, 0.0);
+
+        if p.squared_length() >= 1.0 {
+            break;
+        }
+    }
+    p
 }
 
 fn hit_sphere(center: &Vec3, radius: f64, ray: &Ray) -> f64 {
