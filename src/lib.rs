@@ -56,7 +56,7 @@ pub fn ray_tracer() {
 }
 
 fn color(r: &Ray, world: &Reflexible) -> Vec3 {
-    if let Some(rec) = world.hit(r, 0.0, std::f64::MAX) {
+    if let Some(rec) = world.hit(r, 0.001, std::f64::MAX) {
         let target = rec.p + rec.normal + random_in_unit_sphere();
         return 0.5 * color(&Ray::new(rec.p, target - rec.p), world);
     } else {
