@@ -15,8 +15,8 @@ use reflexible::ReflexibleList;
 use vec3::Vec3;
 
 pub fn ray_tracer() {
-    let nx = 800;
-    let ny = 400;
+    let nx = 400;
+    let ny = 200;
     let ns = 100;
 
     let sphere_1 = Sphere::new(
@@ -32,12 +32,12 @@ pub fn ray_tracer() {
     let sphere_3 = Sphere::new(
         Vec3::new(1.0, 0.0, -1.0),
         0.5,
-        Material::Metal(Metal::new(Vec3::new(0.8, 0.6, 0.2))),
+        Material::Metal(Metal::new(Vec3::new(0.8, 0.6, 0.2), 1.0)),
     );
     let sphere_4 = Sphere::new(
         Vec3::new(-1.0, 0.0, -1.0),
         0.5,
-        Material::Metal(Metal::new(Vec3::new(0.8, 0.8, 0.8))),
+        Material::Metal(Metal::new(Vec3::new(0.8, 0.8, 0.8), 0.3)),
     );
 
     let list: Vec<Box<dyn Reflexible>> = vec![
