@@ -45,16 +45,28 @@ pub fn ray_tracer() {
         Material::Dielectric(Dielectric::new(1.5)),
     );
 
+    let R = std::f64::consts::PI / 4.0;
+    let sphere_11 = Sphere::new(
+        Vec3::new(-R, 0.0, -1.0),
+        R,
+        Material::Lambertian(Lambertian::new(Vec3::new(0.0, 0.0, 1.0))),
+    );
+    let sphere_21 = Sphere::new(
+        Vec3::new(R, 0.0, -1.0),
+        R,
+        Material::Lambertian(Lambertian::new(Vec3::new(1.0, 0.0, 0.0))),
+    );
+
     let list: Vec<Box<dyn Reflexible>> = vec![
-        Box::new(sphere_1),
-        Box::new(sphere_2),
-        Box::new(sphere_3),
-        Box::new(sphere_4),
-        Box::new(sphere_5),
+        Box::new(sphere_11),
+        Box::new(sphere_21),
+        //Box::new(sphere_3),
+        //Box::new(sphere_4),
+        //Box::new(sphere_5),
     ];
     let world = ReflexibleList::new(list);
 
-    let cam = Camera::default();
+    let cam = Camera::new(90.0, (nx / ny) as f64);
 
     let mut rng = rand::thread_rng();
 
