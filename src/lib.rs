@@ -6,7 +6,7 @@ mod vec3;
 
 use crate::materials::Scatterable;
 use camera::Camera;
-use materials::{lambertian::Lambertian, metal::Metal, Material};
+use materials::{dielectric::Dielectric, lambertian::Lambertian, metal::Metal, Material};
 use rand::Rng;
 use ray::Ray;
 use reflexible::sphere::Sphere;
@@ -22,7 +22,7 @@ pub fn ray_tracer() {
     let sphere_1 = Sphere::new(
         Vec3::new(0.0, 0.0, -1.0),
         0.5,
-        Material::Lambertian(Lambertian::new(Vec3::new(0.8, 0.3, 0.3))),
+        Material::Lambertian(Lambertian::new(Vec3::new(0.1, 0.2, 0.5))),
     );
     let sphere_2 = Sphere::new(
         Vec3::new(0.0, -100.5, -1.0),
@@ -32,12 +32,17 @@ pub fn ray_tracer() {
     let sphere_3 = Sphere::new(
         Vec3::new(1.0, 0.0, -1.0),
         0.5,
-        Material::Metal(Metal::new(Vec3::new(0.8, 0.6, 0.2), 1.0)),
+        Material::Metal(Metal::new(Vec3::new(0.8, 0.6, 0.2), 0.0)),
     );
     let sphere_4 = Sphere::new(
         Vec3::new(-1.0, 0.0, -1.0),
         0.5,
-        Material::Metal(Metal::new(Vec3::new(0.8, 0.8, 0.8), 0.3)),
+        Material::Dielectric(Dielectric::new(1.5)),
+    );
+    let sphere_5 = Sphere::new(
+        Vec3::new(-1.0, 0.0, -1.0),
+        -0.45,
+        Material::Dielectric(Dielectric::new(1.5)),
     );
 
     let list: Vec<Box<dyn Reflexible>> = vec![
@@ -45,6 +50,7 @@ pub fn ray_tracer() {
         Box::new(sphere_2),
         Box::new(sphere_3),
         Box::new(sphere_4),
+        Box::new(sphere_5),
     ];
     let world = ReflexibleList::new(list);
 

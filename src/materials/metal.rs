@@ -13,7 +13,7 @@ pub struct Metal {
 impl Metal {
     pub fn new(albedo: Vec3, f: f64) -> Metal {
         let fuzz;
-        if f <= 1.0 {
+        if f < 1.0 {
             fuzz = f;
         } else {
             fuzz = 1.0;
