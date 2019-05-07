@@ -1,25 +1,34 @@
-use super::ray::Ray;
-use super::vec3::Vec3;
+pub mod sphere;
+
+use crate::materials::Material;
+use crate::ray::Ray;
+use crate::vec3::Vec3;
 
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub struct HitRecord {
     pub t: f64,
     pub p: Vec3,
     pub normal: Vec3,
+    pub material: Material,
 }
 
 impl HitRecord {
-    pub fn new(t: f64, p: Vec3, normal: Vec3) -> HitRecord {
-        HitRecord { t, p, normal }
-    }
-
-    pub fn zero() -> HitRecord {
+    pub fn new(t: f64, p: Vec3, normal: Vec3, material: Material) -> HitRecord {
         HitRecord {
-            t: 0.0,
-            p: Vec3::new(0.0, 0.0, 0.0),
-            normal: Vec3::new(0.0, 0.0, 0.0),
+            t,
+            p,
+            normal,
+            material,
         }
     }
+
+    //    pub fn zero() -> HitRecord {
+    //        HitRecord {
+    //            t: 0.0,
+    //            p: Vec3::new(0.0, 0.0, 0.0),
+    //            normal: Vec3::new(0.0, 0.0, 0.0),
+    //        }
+    //    }
 }
 
 pub trait Reflexible {

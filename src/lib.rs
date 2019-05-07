@@ -1,27 +1,51 @@
 mod camera;
+mod materials;
 mod ray;
 mod reflexible;
-mod sphere;
 mod vec3;
 
-use rand::Rng;
-
+use crate::materials::Scatterable;
 use camera::Camera;
+use materials::{lambertian::Lambertian, metal::Metal, Material};
+use rand::Rng;
 use ray::Ray;
+use reflexible::sphere::Sphere;
 use reflexible::Reflexible;
 use reflexible::ReflexibleList;
-use sphere::Sphere;
 use vec3::Vec3;
 
 pub fn ray_tracer() {
-    let nx = 400;
-    let ny = 200;
+    let nx = 800;
+    let ny = 400;
     let ns = 100;
 
-    let sphere_1 = Sphere::new(Vec3::new(0.0, 0.0, -1.0), 0.5);
-    let sphere_2 = Sphere::new(Vec3::new(0.0, -100.5, -1.0), 100.0);
+    let sphere_1 = Sphere::new(
+        Vec3::new(0.0, 0.0, -1.0),
+        0.5,
+        Material::Lambertian(Lambertian::new(Vec3::new(0.8, 0.3, 0.3))),
+    );
+    let sphere_2 = Sphere::new(
+        Vec3::new(0.0, -100.5, -1.0),
+        100.0,
+        Material::Lambertian(Lambertian::new(Vec3::new(0.8, 0.8, 0.0))),
+    );
+    let sphere_3 = Sphere::new(
+        Vec3::new(1.0, 0.0, -1.0),
+        0.5,
+        Material::Metal(Metal::new(Vec3::new(0.8, 0.6, 0.2))),
+    );
+    let sphere_4 = Sphere::new(
+        Vec3::new(-1.0, 0.0, -1.0),
+        0.5,
+        Material::Metal(Metal::new(Vec3::new(0.8, 0.8, 0.8))),
+    );
 
-    let list: Vec<Box<dyn Reflexible>> = vec![Box::new(sphere_1), Box::new(sphere_2)];
+    let list: Vec<Box<dyn Reflexible>> = vec![
+        Box::new(sphere_1),
+        Box::new(sphere_2),
+        Box::new(sphere_3),
+        Box::new(sphere_4),
+    ];
     let world = ReflexibleList::new(list);
 
     let cam = Camera::default();
@@ -40,8 +64,8 @@ pub fn ray_tracer() {
                 let v: f64 = (j as f64 + vr) / ny as f64;
 
                 let r = cam.get_ray(u, v);
-                //let p = r.point_at_parameter(2.0);
-                col = col + color(&r, &world);
+                let p = r.point_at_parameter(2.0);
+                col = col + color(&r, &world, 0);
             }
 
             col = col / (ns as f64);
@@ -55,10 +79,20 @@ pub fn ray_tracer() {
     }
 }
 
-fn color(r: &Ray, world: &Reflexible) -> Vec3 {
+fn color(r: &Ray, world: &Reflexible, depth: i64) -> Vec3 {
     if let Some(rec) = world.hit(r, 0.001, std::f64::MAX) {
-        let target = rec.p + rec.normal + random_in_unit_sphere();
-        return 0.5 * color(&Ray::new(rec.p, target - rec.p), world);
+        let mut scattered: Ray = Ray::new(Vec3::new(1.0, 1.0, 1.0), Vec3::new(1.0, 1.0, 1.0));
+        let mut attenuation: Vec3 = Vec3::new(1.0, 1.0, 1.0);
+
+        if depth < 50
+            && rec
+                .material
+                .scatter(r, &rec, &mut attenuation, &mut scattered)
+        {
+            return attenuation * color(&scattered, world, depth + 1);
+        } else {
+            return Vec3::new(0.0, 0.0, 0.0);
+        }
     } else {
         let unit_direction = Vec3::unit_vector(r.direction);
         let t: f64 = 0.5 * (unit_direction.y + 1.0);
@@ -67,7 +101,7 @@ fn color(r: &Ray, world: &Reflexible) -> Vec3 {
     }
 }
 
-fn random_in_unit_sphere() -> Vec3 {
+pub fn random_in_unit_sphere() -> Vec3 {
     let mut p: Vec3;
     let mut rng = rand::thread_rng();
 
