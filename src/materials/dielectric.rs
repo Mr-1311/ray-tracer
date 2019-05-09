@@ -1,5 +1,4 @@
 use super::Scatterable;
-use crate::random_in_unit_sphere;
 use crate::ray::Ray;
 use crate::reflexible::HitRecord;
 use crate::vec3::Vec3;

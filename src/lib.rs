@@ -1,3 +1,5 @@
+extern crate image;
+
 mod camera;
 mod materials;
 mod ray;
@@ -15,9 +17,11 @@ use reflexible::ReflexibleList;
 use vec3::Vec3;
 
 pub fn ray_tracer() {
-    let nx = 400;
-    let ny = 200;
+    let nx = 500;
+    let ny = 250;
     let ns = 100;
+
+    let mut imgbuf = image::ImageBuffer::new(nx, ny);
 
     let sphere_1 = Sphere::new(
         Vec3::new(0.0, 0.0, -1.0),
@@ -32,7 +36,7 @@ pub fn ray_tracer() {
     let sphere_3 = Sphere::new(
         Vec3::new(1.0, 0.0, -1.0),
         0.5,
-        Material::Metal(Metal::new(Vec3::new(0.8, 0.6, 0.2), 0.0)),
+        Material::Metal(Metal::new(Vec3::new(0.8, 0.6, 0.2), 0.6)),
     );
     let sphere_4 = Sphere::new(
         Vec3::new(-1.0, 0.0, -1.0),
@@ -54,17 +58,22 @@ pub fn ray_tracer() {
     ];
     let world = ReflexibleList::new(list);
 
+    let lookfrom = Vec3::new(3.0, 3.0, 2.0);
+    let lookat = Vec3::new(0.0, 0.0, -1.0);
+    let dist_to_focus = (lookfrom - lookat).length();
+    let aperture = 0.0;
+
     let cam = Camera::new(
-        &Vec3::new(-2.0, 2.0, 1.0),
-        &Vec3::new(0.0, 0.0, -1.0),
+        &lookfrom,
+        &lookat,
         &Vec3::new(0.0, 1.0, 0.0),
-        70.0,
-        (nx / ny) as f64,
+        50.0,
+        f64::from(nx) / f64::from(ny),
+        aperture,
+        dist_to_focus,
     );
 
     let mut rng = rand::thread_rng();
-
-    println!("P3\n{} {}\n255", nx, ny);
 
     for j in (0..ny).rev() {
         for i in 0..nx {
@@ -76,19 +85,21 @@ pub fn ray_tracer() {
                 let v: f64 = (j as f64 + vr) / ny as f64;
 
                 let r = cam.get_ray(u, v);
-                let p = r.point_at_parameter(2.0);
                 col = col + color(&r, &world, 0);
             }
 
             col = col / (ns as f64);
             col = Vec3::new(f64::sqrt(col.x), f64::sqrt(col.y), f64::sqrt(col.z));
-            let ir = (255.99 * col.r()) as i64;
-            let ig = (255.99 * col.g()) as i64;
-            let ib = (255.99 * col.b()) as i64;
+            let ir = (255.99 * col.r()) as u8;
+            let ig = (255.99 * col.g()) as u8;
+            let ib = (255.99 * col.b()) as u8;
 
-            println!("{} {} {}", ir, ig, ib);
+            let pixel = imgbuf.get_pixel_mut(i, ((j - ny + 1) as i32).abs() as u32);
+            *pixel = image::Rgb([ir, ig, ib]);
         }
     }
+
+    let _ = image::ImageRgb8(imgbuf).save("out.png");
 }
 
 fn color(r: &Ray, world: &Reflexible, depth: i64) -> Vec3 {
@@ -128,17 +139,4 @@ pub fn random_in_unit_sphere() -> Vec3 {
         }
     }
     p
-}
-
-fn hit_sphere(center: &Vec3, radius: f64, ray: &Ray) -> f64 {
-    let oc = ray.origin - *center;
-    let a = ray.direction.dot(&ray.direction);
-    let b = (2.0 * ray.direction.dot(&oc)) as f64;
-    let c = oc.dot(&oc) - radius * radius;
-    let discriminant = b * b - 4.0 * a * c;
-
-    match discriminant < -1.0 {
-        true => -1.0,
-        false => (-b - f64::sqrt(discriminant)) / (2.0 * a),
-    }
 }
