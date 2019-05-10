@@ -14,6 +14,8 @@ use reflexible::Reflexible;
 use reflexible::ReflexibleList;
 use vec3::Vec3;
 
+use std::time::Instant;
+
 pub fn ray_tracer(world: &ReflexibleList, cam: &Camera, nx: u32, ny: u32) {
     let ns = 100;
 
@@ -21,7 +23,8 @@ pub fn ray_tracer(world: &ReflexibleList, cam: &Camera, nx: u32, ny: u32) {
 
     let mut rng = rand::thread_rng();
 
-    println!("render started and it can take some time.");
+    println!("render started and it may take some time.");
+    let now = Instant::now();
 
     for j in (0..ny).rev() {
         for i in 0..nx {
@@ -54,7 +57,14 @@ pub fn ray_tracer(world: &ReflexibleList, cam: &Camera, nx: u32, ny: u32) {
         }
     }
 
-    let _ = image::ImageRgb8(imgbuf).save("out.png");
+    let duration = now.elapsed();
+
+    let _ = image::ImageRgb8(imgbuf).save("output.jpg");
+
+    println!(
+        "\n\n'output.jpg' generated to the current path in {} milliseconds! ",
+        duration.as_secs() * 1000 + u64::from(duration.subsec_millis())
+    );
 }
 
 fn color(r: &Ray, world: &Reflexible, depth: i64) -> Vec3 {
