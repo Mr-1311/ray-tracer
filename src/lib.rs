@@ -45,14 +45,13 @@ pub fn ray_tracer(world: &ReflexibleList, cam: &Camera, nx: u32, ny: u32) {
             let ig = (255.99 * col.g()) as u8;
             let ib = (255.99 * col.b()) as u8;
 
-            let pixel = imgbuf.get_pixel_mut(i, ((j - ny + 1) as i32).abs() as u32);
+            let pixel = imgbuf.get_pixel_mut(i, ny - (j + 1));
             *pixel = image::Rgb([ir, ig, ib]);
-
             print!(
                 "\rprogress ==> {}/{} = %{}",
-                1 + i + nx * ((j - ny + 1) as i32).abs() as u32,
+                1 + i + nx * (ny - (j + 1)),
                 nx * ny,
-                (1 + i + nx * ((j - ny + 1) as i32).abs() as u32) * 100 / (nx * ny)
+                (1 + i + nx * (ny - (j + 1))) * 100 / (nx * ny)
             );
         }
     }

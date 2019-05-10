@@ -11,7 +11,7 @@ use ray_tracer::vec3::Vec3;
 
 fn main() {
     let nx = 1000;
-    let ny = 1000;
+    let ny = 900;
 
     let sphere_1 = Sphere::new(
         Vec3::new(0.0, 0.0, -1.0),
