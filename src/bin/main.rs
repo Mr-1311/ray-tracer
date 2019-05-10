@@ -9,46 +9,85 @@ use ray_tracer::reflexible::Reflexible;
 use ray_tracer::reflexible::ReflexibleList;
 use ray_tracer::vec3::Vec3;
 
+use rand::Rng;
+
 fn main() {
-    let nx = 1000;
-    let ny = 900;
+    //screen resolution
+    let nx = 1920;
+    let ny = 1080;
 
-    let sphere_1 = Sphere::new(
-        Vec3::new(0.0, 0.0, -1.0),
-        0.5,
-        Material::Lambertian(Lambertian::new(Vec3::new(0.1, 0.2, 0.5))),
-    );
-    let sphere_2 = Sphere::new(
-        Vec3::new(0.0, -100.5, -1.0),
-        100.0,
-        Material::Lambertian(Lambertian::new(Vec3::new(0.8, 0.8, 0.0))),
-    );
-    let sphere_3 = Sphere::new(
-        Vec3::new(1.0, 0.0, -1.0),
-        0.5,
-        Material::Metal(Metal::new(Vec3::new(0.8, 0.6, 0.2), 0.1)),
-    );
-    let sphere_4 = Sphere::new(
-        Vec3::new(-1.0, 0.0, -1.0),
-        0.5,
-        Material::Dielectric(Dielectric::new(1.5)),
-    );
-    let sphere_5 = Sphere::new(
-        Vec3::new(-1.0, 0.0, -1.0),
-        -0.45,
-        Material::Dielectric(Dielectric::new(1.5)),
+    let mut rng = rand::thread_rng();
+
+    let sphere_ground = Sphere::new(
+        Vec3::new(0.0, -1000.0, 0.0),
+        1000.0,
+        Material::Lambertian(Lambertian::new(Vec3::new(0.4, 0.6, 0.4))),
     );
 
-    let list: Vec<Box<dyn Reflexible>> = vec![
-        Box::new(sphere_1),
-        Box::new(sphere_2),
-        Box::new(sphere_3),
-        Box::new(sphere_4),
-        Box::new(sphere_5),
-    ];
+    let mut list: Vec<Box<dyn Reflexible>> = vec![Box::new(sphere_ground)];
+
+    for a in -11..11 {
+        for b in -11..11 {
+            let choose_mat: f64 = rng.gen();
+
+            let center = Vec3::new(
+                f64::from(a) + 0.9 * rng.gen::<f64>(),
+                0.2,
+                f64::from(b) + 0.9 * rng.gen::<f64>(),
+            );
+
+            if (center - Vec3::new(4., 0.2, 0.)).length() > 0.9 {
+                //diffuse
+                if choose_mat < 0.5 {
+                    list.push(Box::new(Sphere::new(
+                        center,
+                        0.2,
+                        Material::Lambertian(Lambertian::new(Vec3::new(
+                            rng.gen::<f64>() * rng.gen::<f64>(),
+                            rng.gen::<f64>() * rng.gen::<f64>(),
+                            rng.gen::<f64>() * rng.gen::<f64>(),
+                        ))),
+                    )));
+                //metal
+                } else if choose_mat < 0.95 {
+                    list.push(Box::new(Sphere::new(
+                        center,
+                        0.2,
+                        Material::Metal(Metal::new(
+                            Vec3::new(
+                                0.5 * (1.0 + rng.gen::<f64>()),
+                                0.5 * (1.0 + rng.gen::<f64>()),
+                                0.5 * (1.0 + rng.gen::<f64>()),
+                            ),
+                            0.1 * rng.gen::<f64>(),
+                        )),
+                    )));
+                } else {
+                    // dielectric
+                    list.push(Box::new(Sphere::new(
+                        center,
+                        0.2,
+                        Material::Dielectric(Dielectric::new(1.5)),
+                    )));
+                }
+            }
+        }
+    }
+
+    list.push(Box::new(Sphere::new(
+        Vec3::new(-4., 5., -7.),
+        5.0,
+        Material::Metal(Metal::new(Vec3::new(0.4, 0.2, 0.1), 0.0)),
+    )));
+    list.push(Box::new(Sphere::new(
+        Vec3::new(5.9, 5., -9.),
+        5.0,
+        Material::Dielectric(Dielectric::new(1.5)),
+    )));
+
     let world = ReflexibleList::new(list);
 
-    let lookfrom = Vec3::new(0.0, 5.0, 5.0);
+    let lookfrom = Vec3::new(0.0, 0.5, 7.0);
     let lookat = Vec3::new(0.0, 0.0, -1.0);
     let dist_to_focus = (lookfrom - lookat).length();
     let aperture = 0.0;
@@ -57,7 +96,7 @@ fn main() {
         &lookfrom,
         &lookat,
         &Vec3::new(0.0, 1.0, 0.0),
-        50.0,
+        30.0,
         f64::from(nx) / f64::from(ny),
         aperture,
         dist_to_focus,
