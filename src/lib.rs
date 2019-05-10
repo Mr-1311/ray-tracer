@@ -1,77 +1,23 @@
 extern crate image;
 
-mod camera;
-mod materials;
-mod ray;
-mod reflexible;
-mod vec3;
+pub mod camera;
+pub mod materials;
+pub mod ray;
+pub mod reflexible;
+pub mod vec3;
 
 use crate::materials::Scatterable;
 use camera::Camera;
-use materials::{dielectric::Dielectric, lambertian::Lambertian, metal::Metal, Material};
 use rand::Rng;
 use ray::Ray;
-use reflexible::sphere::Sphere;
 use reflexible::Reflexible;
 use reflexible::ReflexibleList;
 use vec3::Vec3;
 
-pub fn ray_tracer() {
-    let nx = 1000;
-    let ny = 500;
+pub fn ray_tracer(world: &ReflexibleList, cam: &Camera, nx: u32, ny: u32) {
     let ns = 100;
 
     let mut imgbuf = image::ImageBuffer::new(nx, ny);
-
-    let sphere_1 = Sphere::new(
-        Vec3::new(0.0, 0.0, -1.0),
-        0.5,
-        Material::Lambertian(Lambertian::new(Vec3::new(0.1, 0.2, 0.5))),
-    );
-    let sphere_2 = Sphere::new(
-        Vec3::new(0.0, -100.5, -1.0),
-        100.0,
-        Material::Lambertian(Lambertian::new(Vec3::new(0.8, 0.8, 0.0))),
-    );
-    let sphere_3 = Sphere::new(
-        Vec3::new(1.0, 0.0, -1.0),
-        0.5,
-        Material::Metal(Metal::new(Vec3::new(0.8, 0.6, 0.2), 0.6)),
-    );
-    let sphere_4 = Sphere::new(
-        Vec3::new(-1.0, 0.0, -1.0),
-        0.5,
-        Material::Dielectric(Dielectric::new(1.5)),
-    );
-    let sphere_5 = Sphere::new(
-        Vec3::new(-1.0, 0.0, -1.0),
-        -0.45,
-        Material::Dielectric(Dielectric::new(1.5)),
-    );
-
-    let list: Vec<Box<dyn Reflexible>> = vec![
-        Box::new(sphere_1),
-        Box::new(sphere_2),
-        Box::new(sphere_3),
-        Box::new(sphere_4),
-        Box::new(sphere_5),
-    ];
-    let world = ReflexibleList::new(list);
-
-    let lookfrom = Vec3::new(3.0, 3.0, 2.0);
-    let lookat = Vec3::new(0.0, 0.0, -1.0);
-    let dist_to_focus = (lookfrom - lookat).length();
-    let aperture = 0.0;
-
-    let cam = Camera::new(
-        &lookfrom,
-        &lookat,
-        &Vec3::new(0.0, 1.0, 0.0),
-        50.0,
-        f64::from(nx) / f64::from(ny),
-        aperture,
-        dist_to_focus,
-    );
 
     let mut rng = rand::thread_rng();
 
@@ -87,7 +33,7 @@ pub fn ray_tracer() {
                 let v: f64 = (j as f64 + vr) / ny as f64;
 
                 let r = cam.get_ray(u, v);
-                col = col + color(&r, &world, 0);
+                col = col + color(&r, world, 0);
             }
 
             col = col / (ns as f64);
