@@ -17,8 +17,8 @@ use reflexible::ReflexibleList;
 use vec3::Vec3;
 
 pub fn ray_tracer() {
-    let nx = 500;
-    let ny = 250;
+    let nx = 1000;
+    let ny = 500;
     let ns = 100;
 
     let mut imgbuf = image::ImageBuffer::new(nx, ny);
@@ -75,6 +75,8 @@ pub fn ray_tracer() {
 
     let mut rng = rand::thread_rng();
 
+    println!("render started and it can take some time.");
+
     for j in (0..ny).rev() {
         for i in 0..nx {
             let mut col = Vec3::new(0.0, 0.0, 0.0);
@@ -96,6 +98,13 @@ pub fn ray_tracer() {
 
             let pixel = imgbuf.get_pixel_mut(i, ((j - ny + 1) as i32).abs() as u32);
             *pixel = image::Rgb([ir, ig, ib]);
+
+            print!(
+                "\rprogress ==> {}/{} = %{}",
+                1 + i + nx * ((j - ny + 1) as i32).abs() as u32,
+                nx * ny,
+                (1 + i + nx * ((j - ny + 1) as i32).abs() as u32) * 100 / (nx * ny)
+            );
         }
     }
 
