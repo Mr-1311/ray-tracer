@@ -63,5 +63,5 @@ fn main() {
         dist_to_focus,
     );
 
-    ray_tracer::ray_tracer(&world, &cam, nx, ny);
+    ray_tracer::ray_tracer(&world, &cam, nx, ny, "output.jpg");
 }

@@ -16,7 +16,7 @@ use vec3::Vec3;
 
 use std::time::Instant;
 
-pub fn ray_tracer(world: &ReflexibleList, cam: &Camera, nx: u32, ny: u32) {
+pub fn ray_tracer(world: &ReflexibleList, cam: &Camera, nx: u32, ny: u32, out_name: &str) {
     let ns = 100;
 
     let mut imgbuf = image::ImageBuffer::new(nx, ny);
@@ -58,10 +58,11 @@ pub fn ray_tracer(world: &ReflexibleList, cam: &Camera, nx: u32, ny: u32) {
 
     let duration = now.elapsed();
 
-    let _ = image::ImageRgb8(imgbuf).save("output.jpg");
+    let _ = image::ImageRgb8(imgbuf).save(out_name);
 
     println!(
-        "\n\n'output.jpg' generated to the current path in {} milliseconds! ",
+        "\n\n'{}' generated to the current path in {} milliseconds! ",
+        out_name,
         duration.as_secs() * 1000 + u64::from(duration.subsec_millis())
     );
 }
