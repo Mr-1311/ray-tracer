@@ -4,7 +4,7 @@
 
 ![img](./output.jpg)
 
-## Installation
+## Build and Run
 > rust must be installed.
 ```
 git clone https://github.com/metinUr/ray-tracer.git
